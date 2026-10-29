@@ -4,26 +4,105 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tonkla Backup</title>
+<meta name="description" content="Tonkla Backup – private encrypted backup tool for Tonkla for Kids School. Privacy Policy and Terms of Use.">
 <style>
-body{font-family:sans-serif;max-width:720px;margin:40px auto;padding:0 16px;line-height:1.7;color:#1f2a22;background:#f6faf5}
-h1,h2{color:#1e7a33}
-.credit{margin-top:48px;text-align:center;font-size:10px;letter-spacing:.1em;color:#a3b0a6}
+:root{--green:#1e7a33;--ink:#1f2a22;--muted:#5b6b5f;--bg:#f6faf5;--card:#fff;--line:#dfe9dc}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Thai",sans-serif;margin:0;line-height:1.7;color:var(--ink);background:var(--bg)}
+header{background:var(--green);color:#fff;padding:40px 16px 32px;text-align:center}
+header h1{margin:0;font-size:2rem;color:#fff}
+header p{margin:6px 0 0;opacity:.9}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px}
+nav a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:4px 14px;font-size:.9rem}
+nav a:hover{background:rgba(255,255,255,.15)}
+main{max-width:760px;margin:0 auto;padding:24px 16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:20px 0}
+h2{color:var(--green);margin-top:0;font-size:1.3rem}
+h3{font-size:1.05rem;margin:20px 0 4px}
+.th{color:var(--muted)}
+ul{padding-left:1.2em}
+a{color:var(--green)}
+.updated{font-size:.85rem;color:var(--muted)}
+.credit{margin:32px 0 40px;text-align:center;font-size:10px;letter-spacing:.1em;color:#a3b0a6}
 </style>
 </head>
 <body>
+<header>
 <h1>Tonkla Backup</h1>
-<p>Tonkla Backup is a private tool used only by Tonkla for Kids School (Pak Chong, Nakhon Ratchasima, Thailand) to store encrypted backups of its own school management system in the school's own Google Drive.</p>
-<p>Tonkla Backup เป็นเครื่องมือภายในที่ใช้เฉพาะโรงเรียนกวดวิชาต้นกล้า ฟอร์ คิดส์ เพื่อเก็บไฟล์สำรองข้อมูล (เข้ารหัสแล้ว) ของระบบบริหารโรงเรียนไว้ใน Google Drive ของโรงเรียนเอง</p>
+<p>Encrypted backups for Tonkla for Kids School</p>
+<nav>
+<a href="#about">About / เกี่ยวกับ</a>
+<a href="#privacy">Privacy Policy</a>
+<a href="#terms">Terms of Use</a>
+<a href="#contact">Contact / ติดต่อ</a>
+</nav>
+</header>
 
-<h2 id="privacy">Privacy Policy / นโยบายความเป็นส่วนตัว</h2>
+<main>
+<section id="about">
+<h2>About / เกี่ยวกับแอป</h2>
+<p>Tonkla Backup is a private tool used only by Tonkla for Kids School (Pak Chong, Nakhon Ratchasima, Thailand) to store encrypted backups of its own school management system in the school's own Google Drive.</p>
+<p class="th">Tonkla Backup เป็นเครื่องมือภายในที่ใช้เฉพาะโรงเรียนกวดวิชาต้นกล้า ฟอร์ คิดส์ เพื่อเก็บไฟล์สำรองข้อมูล (เข้ารหัสแล้ว) ของระบบบริหารโรงเรียนไว้ใน Google Drive ของโรงเรียนเอง</p>
+</section>
+
+<section id="privacy">
+<h2>Privacy Policy / นโยบายความเป็นส่วนตัว</h2>
+<p class="updated">Last updated / ปรับปรุงล่าสุด: 29 October 2026</p>
+
+<h3>Who uses this app</h3>
 <ul>
 <li>This app is not offered to the public. Only the school's administrator signs in to it.</li>
-<li>It uses only the Google Drive permission "drive.file", so it can access only the files it creates itself. It cannot see any other files in Google Drive.</li>
-<li>It uploads, lists, and deletes encrypted backup files in one folder. It does not read, sell, or share any personal Google account data with anyone.</li>
-<li>แอปนี้ไม่ได้เปิดให้บุคคลภายนอกใช้งาน และเข้าถึงได้เฉพาะไฟล์สำรองที่แอปสร้างขึ้นเองเท่านั้น ไม่มีการขาย หรือเปิดเผยข้อมูลให้ผู้อื่น</li>
 </ul>
-<p>Contact / ติดต่อ: Tonkla for Kids School, 215/6 Thesaban 16 Rd., Pak Chong, Nakhon Ratchasima 30130, Thailand</p>
+
+<h3>Google user data we access</h3>
+<ul>
+<li>It uses only the Google Drive permission <code>drive.file</code>, so it can access only the files it creates itself. It cannot see any other files in Google Drive.</li>
+<li>It uploads, lists, and deletes encrypted backup files in one folder.</li>
+</ul>
+
+<h3>How the data is used and shared</h3>
+<ul>
+<li>Backup files are encrypted before they are uploaded, and are used only to restore the school's own system.</li>
+<li>It does not read, sell, or share any personal Google account data with anyone, and does not use it for advertising.</li>
+<li>Tonkla Backup's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</li>
+</ul>
+
+<h3>Storage and deletion</h3>
+<ul>
+<li>Backup files are stored only in the school's own Google Drive. The administrator can delete them at any time from the app or from Google Drive.</li>
+<li>Access can be revoked at any time at <a href="https://myaccount.google.com/permissions">Google Account → Third-party access</a>.</li>
+</ul>
+
+<h3 class="th">สรุปภาษาไทย</h3>
+<ul class="th">
+<li>แอปนี้ไม่ได้เปิดให้บุคคลภายนอกใช้งาน มีเพียงผู้ดูแลระบบของโรงเรียนเท่านั้นที่ลงชื่อเข้าใช้</li>
+<li>เข้าถึงได้เฉพาะไฟล์สำรองที่แอปสร้างขึ้นเองเท่านั้น (สิทธิ์ <code>drive.file</code>) มองไม่เห็นไฟล์อื่นใน Google Drive</li>
+<li>ไฟล์สำรองถูกเข้ารหัสก่อนอัปโหลด และเก็บไว้ใน Google Drive ของโรงเรียนเท่านั้น</li>
+<li>ไม่มีการขาย หรือเปิดเผยข้อมูลให้ผู้อื่น และไม่นำไปใช้เพื่อการโฆษณา</li>
+<li>ยกเลิกสิทธิ์การเข้าถึงได้ทุกเมื่อที่หน้า <a href="https://myaccount.google.com/permissions">การเข้าถึงของบุคคลที่สามในบัญชี Google</a></li>
+</ul>
+</section>
+
+<section id="terms">
+<h2>Terms of Use / ข้อกำหนดการใช้งาน</h2>
+<ul>
+<li>Tonkla Backup is for internal use by Tonkla for Kids School only. No one else is permitted to use it.</li>
+<li>The school is responsible for keeping its administrator account and encryption key safe.</li>
+<li>The app is provided as is, for the school's own backup purposes.</li>
+</ul>
+<ul class="th">
+<li>Tonkla Backup ใช้ภายในโรงเรียนกวดวิชาต้นกล้า ฟอร์ คิดส์ เท่านั้น ไม่อนุญาตให้บุคคลอื่นใช้งาน</li>
+<li>โรงเรียนมีหน้าที่ดูแลบัญชีผู้ดูแลระบบและรหัสสำหรับเข้ารหัสไฟล์ให้ปลอดภัย</li>
+</ul>
+</section>
+
+<section id="contact">
+<h2>Contact / ติดต่อ</h2>
+<p>Tonkla for Kids School<br>215/6 Thesaban 16 Rd., Pak Chong, Nakhon Ratchasima 30130, Thailand</p>
+<p class="th">โรงเรียนกวดวิชาต้นกล้า ฟอร์ คิดส์ 215/6 ถ.เทศบาล 16 อ.ปากช่อง จ.นครราชสีมา 30130</p>
+</section>
 
 <div class="credit">Produced by AmmiePeerada</div>
+</main>
 </body>
 </html>
