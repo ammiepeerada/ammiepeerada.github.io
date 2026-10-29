@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>สรุปการโอนเงินเดือน</title>
+<style>
+:root{--green:#1e7a33;--ink:#1f2a22;--muted:#6b7a6f;--line:#d9e5da;--bg:#f6faf5;--card:#fff;--warn:#b45309;--warnbg:#fff7e6;--bad:#b42318;--scb:#4e2a84}
+*{box-sizing:border-box}
+body{font-family:sans-serif;margin:0;padding:16px;color:var(--ink);background:var(--bg);line-height:1.5}
+main{max-width:980px;margin:0 auto}
+h1{color:var(--green);font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+button,.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.primary{background:var(--green);border-color:var(--green);color:#fff}
+button.danger{color:var(--bad)}
+button.copy{padding:2px 8px;font-size:12px}
+button.copy.done{background:var(--green);color:#fff;border-color:var(--green)}
+input,select,textarea{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;color:var(--ink)}
+label.inline{display:flex;gap:6px;align-items:center;font-size:14px}
+.summary{position:sticky;top:0;z-index:2;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.summary div span{display:block;font-size:12px;color:var(--muted)}
+.summary div b{font-size:18px}
+.progress{grid-column:1/-1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--green);width:0}
+.check{grid-column:1/-1;font-size:13px}
+.ok{color:var(--green)}
+.badtxt{color:var(--bad)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:14px}
+th{background:#eef5ee;font-size:12px;color:var(--muted);font-weight:600}
+td.num,th.num{text-align:right}
+tr.paid td{background:#f0f7f0;color:var(--muted)}
+tr.paid .name{text-decoration:line-through}
+.acct{font-family:monospace;font-size:15px;letter-spacing:.03em}
+.amt{font-family:monospace;font-size:15px;font-weight:600}
+.bank{display:inline-block;font-size:11px;padding:1px 6px;border-radius:6px;background:#eee;color:#333}
+.bank.scb{background:var(--scb);color:#fff}
+.warn{display:block;font-size:12px;color:var(--warn)}
+.paidat{display:block;font-size:11px;color:var(--muted)}
+td input.ref{width:110px;font-size:12px;padding:3px 6px}
+input[type=checkbox].paidbox{width:22px;height:22px;cursor:pointer}
+.empty{text-align:center;color:var(--muted);padding:32px}
+dialog{border:1px solid var(--line);border-radius:12px;max-width:640px;width:calc(100% - 32px);padding:16px}
+dialog textarea{width:100%;min-height:200px;font-family:monospace;font-size:13px}
+dialog h2{margin:0 0 8px;font-size:18px;color:var(--green)}
+.hint{font-size:13px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-grid label{font-size:13px;display:flex;flex-direction:column;gap:2px}
+.print-only{display:none}
+.note{font-size:12px;color:var(--muted);margin-top:16px}
+@media (max-width:700px){
+  thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tr{border-bottom:1px solid var(--line);padding:6px 0}
+  td{border:0;padding:4px 10px}
+  td.num{text-align:left}
+  td[data-l]::before{content:attr(data-l);display:block;font-size:11px;color:var(--muted)}
+  .form-grid{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;padding:0}
+  .noprint,.copy,dialog{display:none!important}
+  .summary{position:static}
+  .print-only{display:block}
+  tr.paid td{background:#fff;color:var(--ink)}
+  tr.paid .name{text-decoration:none}
+  .sign{display:flex;justify-content:space-around;margin-top:48px;font-size:14px}
+  .sign div{text-align:center}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>สรุปการโอนเงินเดือนครู</h1>
+<p class="sub">โรงเรียนกวดวิชาต้นกล้า ฟอร์ คิดส์ · บัญชีต้นทาง: ธนาคารไทยพาณิชย์ (SCB)</p>
+
+<div class="bar noprint">
+  <label class="inline">เดือน <input type="month" id="month"></label>
+  <button class="primary" id="btnPaste">วางข้อมูลจากระบบบัญชี</button>
+  <button id="btnAdd">+ เพิ่มรายชื่อ</button>
+  <label class="inline"><input type="checkbox" id="mask"> ซ่อนเลขบัญชี</label>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<table>
+  <thead><tr>
+    <th style="width:48px">โอนแล้ว</th><th>ชื่อ</th><th>ธนาคาร / เลขบัญชี</th><th class="num">ยอดโอน (บาท)</th><th class="noprint">เลขอ้างอิงสลิป</th><th class="noprint"></th>
+  </tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<div class="print-only sign">
+  <div>ลงชื่อ ............................................<br>ผู้จัดทำ (ฝ่ายบัญชี)<br>วันที่ ........./........./.........</div>
+  <div>ลงชื่อ ............................................<br>ผู้อนุมัติ / ผู้โอน (ผู้บริหาร)<br>วันที่ ........./........./.........</div>
+</div>
+
+<div class="bar noprint" style="margin-top:12px">
+  <button id="btnPrint">พิมพ์ / บันทึก PDF</button>
+  <button id="btnExport">ส่งออกไฟล์สำรอง</button>
+  <label class="btn">นำเข้าไฟล์สำรอง<input type="file" id="fileImport" accept=".json,application/json" hidden></label>
+  <button class="danger" id="btnClear">ล้างข้อมูลเดือนนี้</button>
+</div>
+
+<p class="note noprint">ข้อมูลทั้งหมดเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น ไม่มีการส่งขึ้นอินเทอร์เน็ต ถ้าเปลี่ยนเครื่องหรือล้างข้อมูลเบราว์เซอร์ ให้ใช้ "ส่งออกไฟล์สำรอง" ไว้ก่อน และไม่ควรส่งไฟล์สำรองหรือเลขบัญชีผ่าน LINE หรือกลุ่มแชท</p>
+</main>
+
+<dialog id="dlgPaste">
+  <h2>วางข้อมูลจากระบบบัญชี</h2>
+  <p class="hint">คัดลอกตารางสรุปเงินเดือนจากระบบบัญชีหรือ Excel/Google Sheets แล้ววางที่นี่ บรรทัดละ 1 คน ต้องมี <b>ชื่อ</b>, <b>เลขบัญชี</b> และ <b>ยอดสุทธิ</b> (ใส่ชื่อธนาคารได้ ถ้าไม่ใส่จะถือเป็น SCB) แถวหัวตารางจะถูกข้ามให้อัตโนมัติ</p>
+  <textarea id="pasteText" placeholder="ครูสมศรี ใจดี	SCB	123-4-56789-0	15,000.00&#10;ครูสมชาย รักเรียน	กสิกร	987-6-54321-0	12,500.00"></textarea>
+  <label class="inline" style="margin:8px 0"><input type="checkbox" id="pasteReplace" checked> แทนที่รายชื่อเดิมของเดือนนี้</label>
+  <p class="hint" id="pasteMsg"></p>
+  <div class="bar">
+    <button class="primary" id="pasteOk">นำเข้า</button>
+    <button id="pasteCancel">ยกเลิก</button>
+  </div>
+</dialog>
+
+<dialog id="dlgEdit">
+  <h2 id="editTitle">เพิ่มรายชื่อ</h2>
+  <div class="form-grid">
+    <label>ชื่อ<input id="fName"></label>
+    <label>ธนาคาร<select id="fBank"></select></label>
+    <label>เลขบัญชี<input id="fAcct" inputmode="numeric"></label>
+    <label>ยอดโอน (บาท)<input id="fAmt" inputmode="decimal"></label>
+  </div>
+  <div class="bar" style="margin-top:12px">
+    <button class="primary" id="editOk">บันทึก</button>
+    <button id="editCancel">ยกเลิก</button>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  var BANKS = [
+    {code:'SCB', name:'ไทยพาณิชย์', re:/scb|ไทยพาณิชย์|ไทยพานิช/i},
+    {code:'KBANK', name:'กสิกรไทย', re:/kbank|k-bank|กสิกร/i},
+    {code:'KTB', name:'กรุงไทย', re:/ktb|กรุงไทย/i},
+    {code:'BBL', name:'กรุงเทพ', re:/bbl|กรุงเทพ/i},
+    {code:'BAY', name:'กรุงศรีอยุธยา', re:/bay|กรุงศรี/i},
+    {code:'TTB', name:'ทหารไทยธนชาต', re:/ttb|tmb|ทีทีบี|ทหารไทย|ธนชาต/i},
+    {code:'GSB', name:'ออมสิน', re:/gsb|ออมสิน/i},
+    {code:'BAAC', name:'ธ.ก.ส.', re:/baac|ธกส|ธ\.ก\.ส/i},
+    {code:'GHB', name:'อาคารสงเคราะห์', re:/ghb|ธอส|อาคารสงเคราะห์/i},
+    {code:'KKP', name:'เกียรตินาคินภัทร', re:/kkp|เกียรตินาคิน/i},
+    {code:'UOB', name:'ยูโอบี', re:/uob|ยูโอบี/i},
+    {code:'CIMB', name:'ซีไอเอ็มบี', re:/cimb|ซีไอเอ็มบี/i},
+    {code:'LHB', name:'แลนด์ แอนด์ เฮ้าส์', re:/lh ?bank|lhb|แลนด์/i},
+    {code:'OTHER', name:'อื่น ๆ', re:/$^/}
+  ];
+  var $ = function(id){ return document.getElementById(id); };
+  var state = {month:'', rows:[], expected:''};
+  var editingId = null;
+
+  function store(fn){ try { return fn(window.localStorage); } catch(e){ return null; } }
+  function key(m){ return 'tonkla-payroll-' + m; }
+  function load(m){
+    var raw = store(function(s){ return s.getItem(key(m)); });
+    var data = null;
+    try { data = raw ? JSON.parse(raw) : null; } catch(e){}
+    state = {month:m, rows:(data && data.rows) || [], expected:(data && data.expected) || ''};
+  }
+  function save(){
+    var data = JSON.stringify({rows:state.rows, expected:state.expected});
+    store(function(s){ s.setItem(key(state.month), data); s.setItem('tonkla-payroll-last', state.month); });
+  }
+
+  function digits(s){ return String(s||'').replace(/\D/g,''); }
+  function bankOf(code){ for (var i=0;i<BANKS.length;i++) if (BANKS[i].code===code) return BANKS[i]; return BANKS[BANKS.length-1]; }
+  function detectBank(s){ for (var i=0;i<BANKS.length-1;i++) if (BANKS[i].re.test(s)) return BANKS[i].code; return null; }
+  function fmtAcct(a){
+    a = digits(a);
+    return a.length===10 ? a.slice(0,3)+'-'+a.slice(3,4)+'-'+a.slice(4,9)+'-'+a.slice(9) : a;
+  }
+  function maskAcct(a){
+    a = digits(a);
+    return a.length<=4 ? a : 'xxx-x-x' + a.slice(-4,-1) + '-' + a.slice(-1);
+  }
+  function money(n){ return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function parseAmt(s){
+    var t = String(s||'').replace(/[฿,\s]|บาท/g,'');
+    return /^\d+(\.\d{1,2})?$/.test(t) ? Number(t) : NaN;
+  }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  // Each pasted line: find the account (10–15 digits, may contain dashes),
+  // the amount (last number-like cell), an optional bank, and the name.
+  function parseLine(line){
+    var cells = line.indexOf('\t')>=0 ? line.split('\t') : line.split(/\s{2,}|\s*\|\s*|;/);
+    cells = cells.map(function(c){ return c.trim(); }).filter(Boolean);
+    if (cells.length < 2) return null;
+    var acct=null, amt=NaN, bank=null, used={};
+    cells.forEach(function(c,i){
+      if (acct===null && /^[\d\s-]+$/.test(c) && /[-\s]/.test(c) || acct===null && /^\d{10,15}$/.test(c)){
+        var d = digits(c);
+        if (d.length>=10 && d.length<=15){ acct=d; used[i]=1; }
+      }
+    });
+    for (var i=cells.length-1;i>=0;i--){
+      if (used[i]) continue;
+      var a = parseAmt(cells[i]);
+      if (!isNaN(a) && digits(cells[i]).length<=9){ amt=a; used[i]=1; break; }
+    }
+    cells.forEach(function(c,i){
+      if (!used[i] && bank===null){ var b=detectBank(c); if (b){ bank=b; used[i]=1; } }
+    });
+    var name = '';
+    cells.forEach(function(c,i){ if (!used[i] && !name && !/^\d+$/.test(c)) name=c; });
+    if (acct===null || isNaN(amt) || !name) return null;
+    return {id:uid(), name:name, bank:bank||'SCB', acct:acct, amount:amt, paid:false, paidAt:'', ref:''};
+  }
+
+  function warnings(r){
+    var w = [];
+    if (r.bank==='SCB' && r.acct.length!==10) w.push('เลขบัญชี SCB ต้องมี 10 หลัก');
+    if (!(r.amount>0)) w.push('ยอดเงินไม่ถูกต้อง');
+    var dup = state.rows.filter(function(x){ return x.acct===r.acct; }).length;
+    if (dup>1) w.push('เลขบัญชีซ้ำกับคนอื่นในรายการ');
+    return w;
+  }
+
+  function render(){
+    var masked = $('mask').checked;
+    var tb = $('rows');
+    if (!state.rows.length){
+      tb.innerHTML = '<tr><td colspan="6" class="empty">ยังไม่มีรายชื่อของเดือนนี้ กด "วางข้อมูลจากระบบบัญชี" เพื่อเริ่ม</td></tr>';
+    } else {
+      tb.innerHTML = state.rows.map(function(r,i){
+        var b = bankOf(r.bank), w = warnings(r);
+        return '<tr data-id="'+r.id+'" class="'+(r.paid?'paid':'')+'">'+
+          '<td data-l="โอนแล้ว"><input type="checkbox" class="paidbox" '+(r.paid?'checked':'')+' aria-label="โอนแล้ว"></td>'+
+          '<td data-l="ชื่อ"><span class="name">'+(i+1)+'. '+esc(r.name)+'</span>'+(r.paid&&r.paidAt?'<span class="paidat">โอนเมื่อ '+esc(r.paidAt)+'</span>':'')+'</td>'+
+          '<td data-l="ธนาคาร / เลขบัญชี"><span class="bank '+(r.bank==='SCB'?'scb':'')+'">'+esc(b.name)+'</span> '+
+            '<span class="acct">'+esc(masked?maskAcct(r.acct):fmtAcct(r.acct))+'</span> '+
+            '<button class="copy" data-copy="'+esc(r.acct)+'">คัดลอก</button>'+
+            w.map(function(x){ return '<span class="warn">⚠ '+esc(x)+'</span>'; }).join('')+'</td>'+
+          '<td data-l="ยอดโอน (บาท)" class="num"><span class="amt">'+money(r.amount)+'</span> '+
+            '<button class="copy" data-copy="'+r.amount.toFixed(2)+'">คัดลอก</button></td>'+
+          '<td data-l="เลขอ้างอิงสลิป" class="noprint"><input class="ref" value="'+esc(r.ref)+'" placeholder="ไม่บังคับ"></td>'+
+          '<td class="noprint"><button class="copy act-edit">แก้ไข</button> <button class="copy act-del">ลบ</button></td>'+
+        '</tr>';
+      }).join('');
+    }
+    renderSummary();
+  }
+
+  function renderSummary(){
+    var total=0, paid=0, nPaid=0, other=0;
+    state.rows.forEach(function(r){ total+=r.amount; if (r.paid){ paid+=r.amount; nPaid++; } if (r.bank!=='SCB') other++; });
+    var pct = total ? Math.round(paid/total*100) : 0;
+    var exp = parseAmt(state.expected), check = '';
+    if (!isNaN(exp)){
+      var diff = Math.round((total-exp)*100)/100;
+      check = diff===0 ? '<span class="ok">✓ ยอดรวมตรงกับระบบบัญชี</span>'
+        : '<span class="badtxt">✗ ยอดรวมต่างจากระบบบัญชี '+money(Math.abs(diff))+' บาท ('+(diff>0?'มากกว่า':'น้อยกว่า')+') — ตรวจสอบก่อนโอน</span>';
+    }
+    $('summary').innerHTML =
+      '<div><span>ทั้งหมด</span><b>'+state.rows.length+' คน</b></div>'+
+      '<div><span>ยอดรวม (บาท)</span><b>'+money(total)+'</b></div>'+
+      '<div><span>โอนแล้ว '+nPaid+' คน</span><b class="ok">'+money(paid)+'</b></div>'+
+      '<div><span>คงเหลือ '+(state.rows.length-nPaid)+' คน</span><b>'+money(total-paid)+'</b></div>'+
+      '<div class="progress"><i style="width:'+pct+'%"></i></div>'+
+      '<div class="check"><label class="inline noprint">ยอดรวมตามสรุประบบบัญชี <input id="expected" inputmode="decimal" style="width:140px" value="'+esc(state.expected)+'"></label> '+check+
+      (other?' <span class="hint">· โอนต่างธนาคาร '+other+' คน</span>':'')+'</div>';
+  }
+
+  function copyText(t, btn){
+    function ok(){ btn.classList.add('done'); btn.textContent='คัดลอกแล้ว'; setTimeout(function(){ btn.classList.remove('done'); btn.textContent='คัดลอก'; },1500); }
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); ok(); } catch(e){ alert(t); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(ok, fallback); else fallback();
+  }
+
+  function find(id){ for (var i=0;i<state.rows.length;i++) if (state.rows[i].id===id) return state.rows[i]; return null; }
+
+  $('rows').addEventListener('click', function(e){
+    var t = e.target, tr = t.closest('tr[data-id]');
+    if (!tr) return;
+    var r = find(tr.getAttribute('data-id'));
+    if (t.hasAttribute('data-copy')) copyText(t.getAttribute('data-copy'), t);
+    else if (t.classList.contains('act-del')){
+      if (confirm('ลบ "'+r.name+'" ออกจากรายการ?')){ state.rows=state.rows.filter(function(x){ return x!==r; }); save(); render(); }
+    } else if (t.classList.contains('act-edit')) openEdit(r);
+  });
+  $('rows').addEventListener('change', function(e){
+    var t = e.target, tr = t.closest('tr[data-id]');
+    if (!tr) return;
+    var r = find(tr.getAttribute('data-id'));
+    if (t.classList.contains('paidbox')){
+      if (!t.checked && !confirm('ยกเลิกสถานะ "โอนแล้ว" ของ '+r.name+'?')){ t.checked=true; return; }
+      r.paid = t.checked;
+      r.paidAt = t.checked ? new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}) : '';
+      save(); render();
+    } else if (t.classList.contains('ref')){ r.ref = t.value.trim(); save(); }
+  });
+  $('summary').addEventListener('change', function(e){
+    if (e.target.id==='expected'){ state.expected=e.target.value.trim(); save(); renderSummary(); }
+  });
+
+  $('btnPaste').onclick = function(){ $('pasteText').value=''; $('pasteMsg').textContent=''; $('pasteReplace').checked=!state.rows.length || !state.rows.some(function(r){ return r.paid; }); $('dlgPaste').showModal(); };
+  $('pasteCancel').onclick = function(){ $('dlgPaste').close(); };
+  $('pasteOk').onclick = function(){
+    var lines = $('pasteText').value.split(/\r?\n/).filter(function(l){ return l.trim(); });
+    var got=[], skipped=[];
+    lines.forEach(function(l){ var r=parseLine(l); if (r) got.push(r); else skipped.push(l.trim()); });
+    if (!got.length){ $('pasteMsg').innerHTML='<span class="badtxt">อ่านข้อมูลไม่ได้ ตรวจว่าแต่ละบรรทัดมีชื่อ เลขบัญชี และยอดเงิน</span>'; return; }
+    if ($('pasteReplace').checked){
+      if (state.rows.some(function(r){ return r.paid; }) && !confirm('มีรายการที่ติ๊ก "โอนแล้ว" อยู่ แทนที่ทั้งหมดใช่ไหม?')) return;
+      state.rows = got;
+    } else state.rows = state.rows.concat(got);
+    save(); render(); $('dlgPaste').close();
+    if (skipped.length) alert('นำเข้า '+got.length+' คน\nข้าม '+skipped.length+' บรรทัด (เช่น หัวตารางหรือแถวรวม):\n\n'+skipped.slice(0,8).join('\n'));
+  };
+
+  function fillBanks(){ $('fBank').innerHTML = BANKS.map(function(b){ return '<option value="'+b.code+'">'+b.name+'</option>'; }).join(''); }
+  function openEdit(r){
+    editingId = r ? r.id : null;
+    $('editTitle').textContent = r ? 'แก้ไขรายชื่อ' : 'เพิ่มรายชื่อ';
+    $('fName').value = r ? r.name : '';
+    $('fBank').value = r ? r.bank : 'SCB';
+    $('fAcct').value = r ? fmtAcct(r.acct) : '';
+    $('fAmt').value = r ? r.amount.toFixed(2) : '';
+    $('dlgEdit').showModal();
+  }
+  $('btnAdd').onclick = function(){ openEdit(null); };
+  $('editCancel').onclick = function(){ $('dlgEdit').close(); };
+  $('editOk').onclick = function(){
+    var name=$('fName').value.trim(), acct=digits($('fAcct').value), amt=parseAmt($('fAmt').value);
+    if (!name || acct.length<10 || acct.length>15 || isNaN(amt)){ alert('กรุณากรอกชื่อ เลขบัญชี (10–15 หลัก) และยอดเงินให้ถูกต้อง'); return; }
+    var r = editingId ? find(editingId) : null;
+    if (r && r.acct!==acct && !confirm('เลขบัญชีของ '+name+' เปลี่ยนจาก '+fmtAcct(r.acct)+' เป็น '+fmtAcct(acct)+'\nยืนยันกับครูโดยตรงแล้วใช่ไหม?')) return;
+    if (!r){ r={id:uid(), paid:false, paidAt:'', ref:''}; state.rows.push(r); }
+    r.name=name; r.bank=$('fBank').value; r.acct=acct; r.amount=amt;
+    save(); render(); $('dlgEdit').close();
+  };
+
+  $('mask').onchange = function(){ store(function(s){ s.setItem('tonkla-payroll-mask', $('mask').checked?'1':'0'); }); render(); };
+  $('month').onchange = function(){ if ($('month').value){ load($('month').value); render(); } };
+  $('btnPrint').onclick = function(){ window.print(); };
+  $('btnClear').onclick = function(){
+    if (!confirm('ล้างข้อมูลทั้งหมดของเดือน '+state.month+'?')) return;
+    store(function(s){ s.removeItem(key(state.month)); });
+    load(state.month); render();
+  };
+  $('btnExport').onclick = function(){
+    var blob = new Blob([JSON.stringify({app:'tonkla-payroll', month:state.month, rows:state.rows, expected:state.expected}, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'payroll-'+state.month+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  };
+  $('fileImport').onchange = function(e){
+    var f = e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try {
+        var d = JSON.parse(rd.result);
+        if (d.app!=='tonkla-payroll' || !Array.isArray(d.rows)) throw 0;
+        if (state.rows.length && !confirm('แทนที่ข้อมูลเดือน '+d.month+' ด้วยไฟล์นี้?')) return;
+        $('month').value = d.month;
+        state = {month:d.month, rows:d.rows, expected:d.expected||''};
+        save(); render();
+      } catch(err){ alert('ไฟล์ไม่ถูกต้อง'); }
+    };
+    rd.readAsText(f); e.target.value='';
+  };
+
+  fillBanks();
+  var now = new Date();
+  var m = store(function(s){ return s.getItem('tonkla-payroll-last'); }) || (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'));
+  $('month').value = m;
+  $('mask').checked = store(function(s){ return s.getItem('tonkla-payroll-mask'); })==='1';
+  load(m); render();
+})();
+</script>
+</body>
+</html>
